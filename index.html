@@ -4,159 +4,431 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Telegram Mini Apps Vanilla JS Sample App</title>
+    <title>Stake - free bonus - Telegram</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
         body {
-            --bg-color: var(--tg-theme-bg-color);
-            font: 12px/18px "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--tg-theme-text-color);
-            margin: 48px 24px;
-            padding: 0;
-            color-scheme: var(--tg-color-scheme);
+            background: linear-gradient(90deg, #1a1b1e 0%, #1a1f35 100%);
+            font-family: 'Inter', sans-serif;
+            margin:0;
+        }
+
+        .menu-container {
+            max-width: 400px;
+        }
+
+        .language-selector {
+            background: url("assets/bg.png") no-repeat;
+            height: 101px;
+            margin-bottom: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .language-selector select {
+            background-color: #2a2b2e;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .menu-item {
+            margin: 0 20px 10px 20px;
+            background-color: #2a2b2e;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .menu-header {
+            color: #ffffff;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+            font-weight: 500;
+        }
+
+        .menu-header i {
+            color: #8f9094;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 20px;
+            color: #b4b6ba;
+            background-color: #2a2b2e;
+        }
+
+        .menu-item.active .menu-content {
+            max-height: max-content;
+            padding: 15px 20px;
+        }
+
+        .menu-item.active .menu-header i {
+            transform: rotate(180deg);
+        }
+
+        .menu-item:hover .menu-header {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .menu-title {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .menu-icon {
+            width: 32px;
+            height: 32px;
+            background-color: #4a4b4e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            line-height: 1;
+            padding-bottom: 1px;
+        }
+
+        h3 {
+            margin: 0;
+            letter-spacing: -0.02em;
+            font-weight: 600;
+        }
+
+        .step {
+            margin-bottom: 15px;
+        }
+
+        .step-title {
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
         a {
-            color: var(--tg-theme-link-color);
-        }
-        #viewport {
-            position: fixed;
-            left: 0;
-            right: 0;
-            top: 0;
-            height: var(--tg-viewport-stable-height, 100vh);
-            pointer-events: none;
-            transition: all .2s ease;
-        }
-        #viewport:after {
-            content: '';
-            display: block;
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            border-width: 4px;
-            border-style: solid;
-            border-image: linear-gradient(45deg, rgba(64, 224, 208, .5), rgba(173, 255, 47, .5)) 1;
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s ease, text-decoration 0.3s ease;
         }
 
-        #viewport-params-size,
-        #viewport-params-expand {
-            content: attr(text);
-            position: absolute;
-            display: inline-block;
-            background: var(--tg-theme-link-color, rgb(64, 224, 208));
-            right: 4px;
-            left: auto;
-            font-size: 8px;
-            padding: 4px;
-            vertical-align: top;
+        a:hover {
+            color: #2980b9;
+            text-decoration: underline;
         }
-        #viewport-params-size {
-            top: 4px;
-        }
-        #viewport-params-expand {
-            top: 30px;
-        }
+
     </style>
 </head>
-
 <body>
-    <main>
-        <div align="center">
-            <a href="https://ton.org/"><img width="48" src="./assets/tapps.png" alt="logo of telegram web apps"></a>
-        </div>
-        <h1>Modals</h1>
-        <button onclick="Telegram.WebApp.showAlert('Hello World!');">Launch Alert</button>
-        <button onclick="showPopup();">Launch Popup</button>
+<div class="menu-container">
+    <div class="language-selector">
+        <label>🌍</label>
+        <select id="languageSelect">
+            <option value="fr">Français</option>
+            <option value="en">English</option>
+        </select>
+    </div>
 
-        <h1>Links</h1>
-        <ul>
-            <li>
-                <a href="javascript:Telegram.WebApp.openTelegramLink('https://t.me/trendingapps');">Open link within Telegram</a>
-            </li>
-            <li>
-                <a href="javascript:Telegram.WebApp.openLink('https://ton.org/');">Open link in external browser</a>
-            </li>
-            <li>
-                <a href="javascript:Telegram.WebApp.openLink('https://telegra.ph/api',{try_instant_view:true});">Open link inside Telegram webview</a>
-            </li>
-        </ul>
+    <div id="menuContent">
+    </div>
+</div>
 
-        <h1>Buttons</h1>
-        <button onclick="Telegram.WebApp.expand();">Expand Webview</button>
-        <button onclick="toggleMainButton();">Toggle Main Button</button>
-    </main>
-    <div id="viewport"></div>
-    <div id="viewport-params-size"></div>
-    <div id="viewport-params-expand"></div>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script>
-        // Init TWA
-        Telegram.WebApp.ready();
+<script>
+    // Définition des traductions
+    const translations = {
+        fr: {
+            vpn: {
+                title: 'Le site est inaccessible',
+                description: 'En fonction de votre géolocalisation, il se peut que vous n\'ayez pas accès au site. Pour y accéder, suivez les étapes suivantes.',
+                steps: [
+                    {
+                        title: 'Étape 1 : Choisissez un VPN',
+                        content: 'Que ce soit sur mobile ou ordinateur, il existe de nombreux VPN, dont certains gratuits, qui vous permettent de changer votre géolocalisation et accéder au site.<br>' +
+                            'Recommandation : <strong>NordVPN</strong>'
+                    },
+                    {
+                        title: 'Étape 2 : Installer l\'application',
+                        content: 'Une fois que vous avez choisi votre VPN, téléchargez l\'application sur votre appareil ou ajoutez-le à l\'extension de votre navigateur.'
+                    },
+                    {
+                        title: 'Étape 3 : Créez un compte',
+                        content: 'Créez un compte avec un email valide sur votre VPN choisi et connectez-vous à l\'application.'
+                    },
+                    {
+                        title: 'Étape 4 : Choisissez un serveur',
+                        content: 'Maintenant que vous êtes connecté au VPN, choisissez un serveur (Norvège, Finlande, Irlande) et connectez-vous.'
+                    }
+                ],
+                final: '<strong>Félicitations, vous êtes désormais connecté au VPN et vous pouvez désormais vous inscrire sur Stake et réclamer votre bonus de 21 $.</strong><br>'+
+                    '<strong><a href="javascript:Telegram.WebApp.openLink(\'https://stake.com/?c=HRtelegram\');">S\'inscrire sur Stake</a></strong><br><br>' +
+                    'Une fois inscrit, reprenez la procédure sur Telegram.'
 
-        // Event occurs whenever theme settings are changed in the user's Telegram app (including switching to night mode).
-        Telegram.WebApp.onEvent('themeChanged', function() {
-            document.documentElement.className = Telegram.WebApp.colorScheme;
-        });
-
-        // Show main button
-        Telegram.WebApp.MainButton.setParams({
-            text: 'Main Button'
-        });
-        Telegram.WebApp.MainButton.onClick(function () {
-            Telegram.WebApp.showAlert('Main Button was clicked')
-        });	
-        Telegram.WebApp.MainButton.show();
-
-        // Function to call showPopup API
-        function showPopup() {
-            Telegram.WebApp.showPopup({
-                title: 'Title',
-                message: 'Some message',
-                buttons: [
-                    {id: 'link', type: 'default', text: 'Open ton.org'},
-                    {type: 'cancel'},
+            },
+            inscription: {
+                title: 'Comment s\'inscrire sur Stake',
+                description: 'S\'inscrire sur Stake est simple et rapide. Suivez ces étapes pour créer votre compte et commencer à profiter de l\'expérience :',
+                steps: [
+                    {
+                        title: 'Étape 1 : Inscrivez-vous',
+                        content: 'Rendez-vous sur le site <a href="javascript:Telegram.WebApp.openLink(\'https://stake.com/?c=HRtelegram\');">stake.com</a>, puis cliquez sur le bouton "S\'inscrire" ou "Enregistrement". Choisissez ensuite la langue de votre choix pour commencer.'
+                    },
+                    {
+                        title: 'Étape 2 : Remplissez le formulaire',
+                        content: 'Complétez le formulaire d\'inscription en entrant vos informations personnelles. N\'oubliez pas de choisir un pseudo unique (gardez-le bien en tête, il vous sera demandé plus tard pour réclamer votre bonus).'
+                    },
+                    {
+                        title: 'Étape 3 : Vérifiez votre adresse e-mail',
+                        content: 'Un lien de confirmation vous sera envoyé par e-mail. Cliquez dessus pour valider votre adresse et finaliser votre inscription.'
+                    },
+                ],
+                final: '<strong>Félicitations ! Vous êtes désormais inscrit sur Stake !</strong><br><br>'+
+                    'Amusez-vous bien et n\'oubliez pas de réclamer votre bonus de 21 $ sur Telegram en suivant la procédure !'
+            },
+            deposit: {
+                title: 'Comment effectuer un dépôt sur Stake ?',
+                description: 'Effectuer un dépôt sur Stake est simple et rapide. Suivez les étapes ci-dessous pour ajouter des fonds à votre compte :',
+                steps: [
+                    {
+                        title: 'Étape 1 : Accédez à votre compte',
+                        content: 'Connectez-vous à votre compte en utilisant votre adresse e-mail et votre mot de passe. Si vous n\'avez pas encore de compte, <a href="javascript:Telegram.WebApp.openLink(\'https://stake.com/?c=HRtelegram\');">cliquez ici pour vous inscrire.</a><br>' +
+                            'Une fois connecté, allez dans la section "Portefeuille" en haut de votre écran pour accéder aux options de dépôt.'
+                    },
+                    {
+                        title: 'Étape 2 : Choisissez votre méthode de dépôt',
+                        content: 'Sur la page dédiée aux dépôts, vous aurez plusieurs options pour ajouter des fonds à votre compte.<br/>'+
+                        'Stake étant un casino en ligne crypto, vous devez posséder de la cryptomonnaie pour effectuer un dépôt. Si vous avez déjà des cryptomonnaies, copiez l\'adresse de dépôt ou scannez le code QR fourni par Stake.com. Transférez ensuite vos fonds depuis votre portefeuille de cryptomonnaie vers votre compte Stake.</br>'+
+                        'Si vous ne possédez pas encore de cryptomonnaie, vous pouvez en acheter en cliquant sur le bouton "Buy Crypto", où vous pourrez acheter des cryptos directement via la plateforme.'
+                    },
+                    {
+                        title: 'Étape 3 : Confirmez votre dépôt',
+                        content: 'Une fois la transaction lancée, elle sera confirmée et les fonds apparaîtront sur votre compte Stake.<br>' +
+                            'Notez que les délais de traitement peuvent varier en fonction de la méthode choisie. Soyez donc patient si la transaction prend un peu de temps. Si vous avez des questions ou des problèmes, n\'hésitez pas à contacter le support client de Stake pour obtenir de l\'aide.'
+                    },
                 ]
-            }, function(btn) {
-                if (btn === 'link') {
-                    Telegram.WebApp.openLink('https://ton.org/');
+            },
+            withdraw: {
+                title: 'Comment retirer vos fonds sur Stake ?',
+                description: 'Retirer vos fonds de Stake est un processus simple. Suivez ces étapes pour effectuer un retrait en toute sécurité :',
+                steps: [
+                    {
+                        title: 'Étape 1 : Connectez-vous à votre compte',
+                        content: 'Accédez à votre compte en vous connectant avec votre adresse e-mail et votre mot de passe.<br>' +
+                            'Une fois connecté, cliquez sur la section "Portefeuille" située en haut de votre écran pour accéder à vos fonds.'
+                    },
+                    {
+                        title: 'Étape 2 : Sélectionnez la balance à retirer',
+                        content: 'Dans votre "Portefeuille", cliquez sur l\'option "Retirer" pour accéder à vos soldes disponibles.<br>' +
+                            'Sélectionnez la cryptomonnaie ou la méthode de retrait que vous souhaitez utiliser, puis entrez l\'adresse de retrait appropriée pour la cryptomonnaie choisie.'
+                    },
+                    {
+                        title: 'Étape 3 : Validez votre retrait',
+                        content: 'Vérifiez que l\'adresse de retrait est correcte et correspond bien à votre portefeuille.<br>' +
+                            'Ensuite, indiquez le montant à retirer et confirmez la transaction.<br>' +
+                            'Si vous rencontrez des difficultés ou avez des questions, n\'hésitez pas à contacter le support client de Stake pour obtenir de l\'aide. Vous pouvez les joindre directement depuis la plateforme.'
+                    },
+                ]
+            }
+        },
+        en: {
+            vpn: {
+                title: 'The site is inaccessible',
+                description: 'Depending on your geolocation, you may not have access to the site. To access it, follow the steps below.',
+                steps: [
+                    {
+                        title: 'Step 1: Choose a VPN',
+                        content: 'Whether on mobile or computer, there are many VPNs, some of which are free, that allow you to change your geolocation and access the site.<br>' +
+                            'Recommendation : <strong>NordVPN</strong>'
+                    },
+                    {
+                        title: 'Step 2: Install the application',
+                        content: 'Once you\'ve chosen your VPN, download the app to your device or add it as a browser extension.'
+                    },
+                    {
+                        title: 'Step 3: Create an account',
+                        content: 'Create an account with a valid email on your chosen VPN and log in to the app.'
+                    },
+                    {
+                        title: 'Step 4: Choose a server',
+                        content: 'Now that you are connected to the VPN, choose a server (Norway, Finland, Ireland) and connect.'
+                    }
+                ],
+                final: '<strong>Congratulations, you are now connected to the VPN and can sign up for Stake and claim your $21 bonus.</strong><br>'+
+                    '<strong><a href="javascript:Telegram.WebApp.openLink(\'https://stake.com/?c=HRtelegram\');">Sign up for Stake</a></strong><br><br>' +
+                    'Once signed up, continue the process on Telegram.'
+
+            },
+            inscription: {
+                title: 'How to sign up for Stake',
+                description: 'Signing up for Stake is simple and quick. Follow these steps to create your account and start enjoying the experience:',
+                steps: [
+                    {
+                        title: 'Step 1: Sign up',
+                        content: 'Go to the website <a href="javascript:Telegram.WebApp.openLink(\'https://stake.com/?c=HRtelegram\');">stake.com</a>, then click on the "Sign up" or "Register" button. Choose your preferred language to get started.'
+                    },
+                    {
+                        title: 'Step 2: Fill out the form',
+                        content: 'Complete the sign-up form by entering your personal information. Don’t forget to choose a unique username (keep it in mind, as you will be asked for it later to claim your bonus).'
+                    },
+                    {
+                        title: 'Step 3: Verify your email address',
+                        content: 'A confirmation link will be sent to your email. Click on it to validate your address and finalize your registration.'
+                    },
+                ],
+                final: '<strong>Congratulations! You are now registered on Stake!</strong><br><br>'+
+                    'Have fun and don’t forget to claim your $21 bonus on Telegram by following the procedure!'
+            },
+            deposit: {
+                title: 'How to make a deposit on Stake?',
+                description: 'Making a deposit on Stake is simple and quick. Follow the steps below to add funds to your account:',
+                steps: [
+                    {
+                        title: 'Step 1: Access your account',
+                        content: 'Log in to your account using your email and password. If you don’t have an account yet, <a href="javascript:Telegram.WebApp.openLink(\'https://stake.com/?c=HRtelegram\');">click here to sign up</a>.<br>' +
+                            'Once logged in, go to the "Wallet" section at the top of your screen to access the deposit options.'
+                    },
+                    {
+                        title: 'Step 2: Choose your deposit method',
+                        content: 'On the deposit page, you will have several options to add funds to your account.<br>' +
+                            'Since Stake is a crypto casino, you need to have cryptocurrency to make a deposit. If you already have cryptocurrencies, copy the deposit address or scan the QR code provided by Stake.com. Then transfer your funds from your cryptocurrency wallet to your Stake account.<br>' +
+                            'If you don’t own any cryptocurrency yet, you can buy some by clicking the "Buy Crypto" button, where you can purchase crypto directly via the platform.'
+                    },
+                    {
+                        title: 'Step 3: Confirm your deposit',
+                        content: 'Once the transaction is initiated, it will be confirmed, and the funds will appear in your Stake account.<br>' +
+                            'Note that processing times may vary depending on the method chosen. So be patient if the transaction takes a bit longer. If you have any questions or issues, feel free to contact Stake\'s customer support for assistance.'
+                    },
+                ],
+                final: ''
+            },
+            withdraw: {
+                title: 'How to withdraw your funds from Stake?',
+                description: 'Withdrawing your funds from Stake is a simple process. Follow these steps to make a secure withdrawal:',
+                steps: [
+                    {
+                        title: 'Step 1: Log into your account',
+                        content: 'Access your account by logging in with your email and password.<br>'+
+                        'Once logged in, click on the "Wallet" section at the top of your screen to access your funds.'
+                    },
+                    {
+                        title: 'Step 2: Select the balance to withdraw',
+                        content: 'In your "Wallet," click on the "Withdraw" option to access your available balances.<br>' +
+                            'Select the cryptocurrency or withdrawal method you wish to use, then enter the appropriate withdrawal address for the chosen cryptocurrency.'
+                    },
+                    {
+                        title: 'Step 3: Confirm your withdrawal',
+                        content: 'Make sure the withdrawal address is correct and matches your wallet.<br>' +
+                            'Then, enter the amount you want to withdraw and confirm the transaction.<br>' +
+                            'If you encounter any difficulties or have questions, feel free to contact Stake\'s customer support for assistance. You can reach them directly from the platform.\n'
+                    },
+                ],
+                final: ''
+            }
+        }
+    };
+
+    // Fonction pour détecter la langue via Telegram WebApp
+    async function detectTelegramLanguage() {
+        if (window.Telegram && window.Telegram.WebApp) {
+            return window.Telegram.WebApp.initDataUnsafe?.user?.language_code || 'en';
+        }
+        return 'en'; // Langue par défaut si Telegram n'est pas disponible
+    }
+
+    // Génération du menu
+    function generateMenu(language) {
+        const trans = translations[language] || translations.fr;
+        const menuContent = document.getElementById('menuContent');
+        menuContent.innerHTML = '';
+
+        const sections = [
+            { key: 'vpn', icon: '🌐' },
+            { key: 'inscription', icon: '📝' },
+            { key: 'deposit', icon: '🪙' },
+            { key: 'withdraw', icon: '💰' }
+        ];
+
+        sections.forEach(section => {
+            const sectionData = trans[section.key];
+            const menuItem = `
+            <div class="menu-item">
+                <div class="menu-header">
+                    <div class="menu-title">
+                        <div class="menu-icon">${section.icon}</div>
+                        <h3>${sectionData.title}</h3>
+                    </div>
+                    <i>▼</i>
+                </div>
+                <div class="menu-content">
+                    ${sectionData.description}
+                    ${sectionData.steps.map(step => `
+                        <div class="step">
+                            <div class="step-title">${step.title}</div>
+                            <div class="step-content">${step.content}</div>
+                        </div>
+                    `).join('')}
+                    ${sectionData.final}
+                </div>
+            </div>
+        `;
+            menuContent.insertAdjacentHTML('beforeend', menuItem);
+        });
+
+        // Réattacher les event listeners
+        attachEventListeners();
+    }
+
+    // Fonction pour attacher les event listeners
+    function attachEventListeners() {
+        document.querySelectorAll('.menu-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const menuItem = header.parentElement;
+                const wasActive = menuItem.classList.contains('active');
+
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+
+                if (!wasActive) {
+                    menuItem.classList.add('active');
                 }
             });
-        };
+        });
+    }
 
-        // Function to toggle main TWA button
-        function toggleMainButton() {
-            if (Telegram.WebApp.MainButton.isVisible) {
-                Telegram.WebApp.MainButton.hide();
-            } else {
-                Telegram.WebApp.MainButton.show();
-            }
-        };
+    // Initialisation
+    async function init() {
+        const telegramLang = await detectTelegramLanguage();
+        const languageSelect = document.getElementById('languageSelect');
 
-        function setViewportData() {
-            var sizeEl = document.getElementById('viewport-params-size');
-            sizeEl.innerText = 'width: ' + window.innerWidth + ' x ' + 
-                'height: ' + Telegram.WebApp.viewportStableHeight;
-
-            var expandEl = document.querySelector('#viewport-params-expand');
-            expandEl.innerText = 'Is Expanded: ' + (Telegram.WebApp.isExpanded ? 'true' : 'false');
+        // Mettre à jour le sélecteur avec la langue détectée
+        if (translations[telegramLang]) {
+            languageSelect.value = telegramLang;
         }
 
-        Telegram.WebApp.setHeaderColor('secondary_bg_color');
+        // Générer le menu initial
+        generateMenu(languageSelect.value);
 
-        setViewportData();
-        Telegram.WebApp.onEvent('viewportChanged', setViewportData);
-
-        Telegram.WebApp.onEvent('themeChanged', function() {
-            document.body.setAttribute('style', '--bg-color:' + Telegram.WebApp.backgroundColor);
+        // Ajouter l'event listener pour le changement de langue
+        languageSelect.addEventListener('change', (e) => {
+            generateMenu(e.target.value);
         });
+    }
 
-    </script>
-
-    <!-- Eruda is console for mobile browsers -->
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-    <script>eruda.init();</script>
+    // Démarrer l'application
+    init();
+</script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 </body>
 </html>
